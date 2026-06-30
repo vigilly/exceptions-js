@@ -2,11 +2,12 @@
  * `@vigilly/node` — the Vigilly exceptions client for Node.js.
  *
  * A thin, branded wrapper around the MIT-licensed `@sentry/node` SDK. It presets
- * the transport to Vigilly's ingest (via the SDK's `tunnel` option) and exposes
- * only the exception-reporting surface Vigilly supports today.
+ * the transport to Vigilly's ingest (via the SDK's `tunnel` option, pointing at
+ * `https://<host>/api/observe/<projectId>/envelope/`) and exposes only the
+ * exception-reporting surface Vigilly supports today.
  *
  *     import { Vigilly } from "@vigilly/node";
- *     Vigilly.init({ dsn: "https://<publicKey>@<project>.vigilly.dev" });
+ *     Vigilly.init({ dsn: "https://<publicKey>@vigilly.dev/<projectId>" });
  *     Vigilly.captureException(new Error("boom"));
  */
 import * as Sentry from "@sentry/node";
@@ -14,7 +15,7 @@ import { resolveVigillyOptions, type VigillyOptions } from "@vigilly/core";
 
 /**
  * Initialise the Vigilly Node client. Wraps `Sentry.init`, routing all envelopes
- * to `https://<project>.vigilly.dev/api/observe/<projectId>/envelope/`.
+ * to `https://<host>/api/observe/<projectId>/envelope/`.
  */
 export function init(options: VigillyOptions): ReturnType<typeof Sentry.init> {
   return Sentry.init(resolveVigillyOptions(options) as Sentry.NodeOptions);

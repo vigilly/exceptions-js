@@ -1,13 +1,15 @@
 /**
  * Vigilly DSN parsing.
  *
- * A Vigilly DSN identifies a project and carries its public ingest key:
+ * A Vigilly DSN is a standard Sentry-shaped DSN:
  *
- *     https://<publicKey>@<project>.vigilly.dev
+ *     https://<publicKey>@<host>/<projectId>
  *
- * An explicit numeric/textual project id may optionally be appended as a path
- * segment (`https://<publicKey>@<project>.vigilly.dev/<projectId>`); when it is
- * omitted the project id defaults to the left-most host label (`<project>`).
+ * e.g. `https://<publicKey>@vigilly.dev/<projectId>`. The host is the Vigilly
+ * Observe ingest host (`vigilly.dev` in prod, `staging.vigilly.dev` /
+ * `local.vigilly.dev` for other envs) and is used AS-IS. The public key
+ * identifies the service to Vigilly ingest; the projectId is the DSN path
+ * segment (present for Sentry-DSN-format compatibility, not used for auth).
  *
  * Vigilly's ingest route is `<host>/api/observe/<projectId>/envelope/`, which is
  * NOT the path a stock Sentry DSN derives (`<host>/api/<projectId>/envelope/`).
@@ -15,13 +17,13 @@
  */
 
 export interface VigillyDsnComponents {
-  /** DSN public key — used by Vigilly ingest for auth. */
+  /** DSN public key — identifies the service to Vigilly ingest (auth). */
   publicKey: string;
   /** URL protocol, e.g. `https`. */
   protocol: string;
-  /** Full host, e.g. `myproject.vigilly.dev`. */
+  /** Ingest host, used as-is, e.g. `vigilly.dev`. */
   host: string;
-  /** Project identifier used in the ingest path. */
+  /** Project identifier from the DSN path; used in the ingest path. */
   projectId: string;
 }
 
@@ -62,18 +64,20 @@ export function parseVigillyDsn(dsn: string): VigillyDsnComponents {
     throw new InvalidVigillyDsnError(dsn, "DSN must not contain a secret — only the public key");
   }
 
-  const host = url.host; // includes port if present
+  const host = url.host; // used as-is; includes port if present
   if (!host) {
     throw new InvalidVigillyDsnError(dsn, "missing host");
   }
 
   const protocol = url.protocol.replace(":", "");
 
-  // Optional explicit project id from the path; otherwise the first host label.
-  const pathProjectId = url.pathname.split("/").filter(Boolean).pop();
-  const projectId = pathProjectId || url.hostname.split(".")[0] || "";
+  // Project id is the DSN path segment.
+  const projectId = url.pathname.split("/").filter(Boolean).pop() || "";
   if (!projectId) {
-    throw new InvalidVigillyDsnError(dsn, "could not derive a project id from host or path");
+    throw new InvalidVigillyDsnError(
+      dsn,
+      "missing project id (expected https://<publicKey>@<host>/<projectId>)",
+    );
   }
 
   return { publicKey, protocol, host, projectId };
@@ -90,10 +94,11 @@ export function envelopeTunnelUrl(c: VigillyDsnComponents): string {
 
 /**
  * Placeholder project id used in the synthesised Sentry DSN. The Sentry SDK
- * validates that a DSN's project id is purely numeric, but Vigilly project ids
- * are host labels (e.g. `myproject`). The DSN's project id is irrelevant to
- * Vigilly — the transport URL is overridden by the `tunnel` and ingest auth uses
- * only the public key — so any valid numeric value works.
+ * validates that a DSN's project id is purely numeric, while a Vigilly project
+ * id may be a non-numeric slug. The synthesised DSN's project id is irrelevant
+ * to Vigilly — the transport URL is overridden by the `tunnel` and ingest auth
+ * uses only the public key — so a constant numeric value is always safe. The
+ * real project id is carried in the tunnel path (see `envelopeTunnelUrl`).
  */
 const SENTRY_DSN_PROJECT_ID = "0";
 

@@ -32,22 +32,20 @@ describe("@vigilly/node routing", () => {
     const capture: { url?: string; bodies: string[] } = { bodies: [] };
 
     Vigilly.init({
-      dsn: "https://abc123@myproject.vigilly.dev",
+      dsn: "https://abc123@vigilly.dev/42",
       transport: makeCapturingTransport(capture),
     });
 
     Vigilly.captureException(new Error("boom"));
     await Vigilly.flush(2000);
 
-    // The transport URL must be Vigilly's ingest route, not Sentry's default.
-    expect(capture.url).toBe(
-      "https://myproject.vigilly.dev/api/observe/myproject/envelope/",
-    );
+    // The transport URL must be Vigilly's ingest route (bare host), not Sentry's default.
+    expect(capture.url).toBe("https://vigilly.dev/api/observe/42/envelope/");
 
     // An envelope carrying the DSN public key (for ingest auth) was sent.
     expect(capture.bodies.length).toBeGreaterThan(0);
     const envelope = capture.bodies.join("\n");
-    expect(envelope).toContain("abc123@myproject.vigilly.dev");
+    expect(envelope).toContain("abc123@vigilly.dev");
     expect(envelope).toContain("boom");
   });
 });

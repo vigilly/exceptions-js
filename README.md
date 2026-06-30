@@ -29,7 +29,7 @@ The matching `@sentry/*` SDK is pulled in automatically as a dependency.
 import { Vigilly } from "@vigilly/browser"; // or "@vigilly/node"
 
 Vigilly.init({
-  dsn: "https://<publicKey>@<project>.vigilly.dev",
+  dsn: "https://<publicKey>@vigilly.dev/<projectId>",
   release: "my-app@1.2.3",
   environment: "production",
 });
@@ -59,33 +59,39 @@ import { init, captureException, captureMessage } from "@vigilly/node";
 
 ## DSN format
 
-A Vigilly DSN identifies a project and carries its public ingest key:
+A Vigilly DSN is a standard Sentry-shaped DSN — the **public key** identifies
+your service and the **host** is the Vigilly Observe ingest host (used as-is):
 
 ```
-https://<publicKey>@<project>.vigilly.dev
+https://<publicKey>@<host>/<projectId>
 ```
 
-An explicit project id may optionally be appended as a path segment
-(`https://<publicKey>@<project>.vigilly.dev/<projectId>`); otherwise the project
-id defaults to the left-most host label (`<project>`).
+e.g. `https://<publicKey>@vigilly.dev/<projectId>` (prod). Other environments use
+the matching host, e.g. `https://<publicKey>@staging.vigilly.dev/<projectId>`.
 
 ### How the endpoint is handled
 
 A stock Sentry DSN derives the ingest URL `<host>/api/<projectId>/envelope/`.
-Vigilly's ingest route is different:
+Vigilly's ingest route adds an `observe/` segment:
 
 ```
-https://<project>.vigilly.dev/api/observe/<projectId>/envelope/
+https://<host>/api/observe/<projectId>/envelope/
 ```
 
 So the wrapper does **not** hand the Vigilly DSN to Sentry verbatim. It parses
-the DSN, synthesises a Sentry-valid DSN, and sets the Sentry SDK's
+the DSN and sets the Sentry SDK's
 [`tunnel`](https://docs.sentry.io/platforms/javascript/troubleshooting/#dealing-with-ad-blockers)
-option to the exact Vigilly URL above. With `tunnel` set, the SDK posts the full
-envelope (including the `dsn` in its header) to that URL. Vigilly authenticates
-the request using the DSN **public key** — read from the `X-Sentry-Auth` header,
-the `?sentry_key=` query parameter, or the envelope header's `dsn` field — exactly
-as the upstream Sentry SDK already provides it. No secret is ever sent.
+to `${protocol}://${host}/api/observe/${projectId}/envelope/` — the bare DSN host
+with `observe/` injected before the project id. With `tunnel` set, the SDK posts
+the full envelope (including the `dsn` in its header) to that URL.
+
+It also synthesises a Sentry-valid DSN for `Sentry.init`: the Sentry SDK requires
+a numeric project id in the DSN, while a Vigilly project id may be a non-numeric
+slug, so the synthesised DSN uses a numeric placeholder (`/0`). That project id is
+irrelevant to Vigilly — the transport URL is overridden by the tunnel and ingest
+auth uses only the public key (read from the `X-Sentry-Auth` header, the
+`?sentry_key=` query parameter, or the envelope header's `dsn` field, exactly as
+the upstream SDK already provides). No secret is ever sent.
 
 ## What's supported
 

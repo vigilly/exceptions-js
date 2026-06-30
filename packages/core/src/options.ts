@@ -30,7 +30,7 @@ export type VigillyEventHint = Record<string, any>;
  * integrations, …) are deliberately absent.
  */
 export interface VigillyOptions {
-  /** Vigilly DSN: `https://<publicKey>@<project>.vigilly.dev`. */
+  /** Vigilly DSN: `https://<publicKey>@<host>/<projectId>`, e.g. `https://<publicKey>@vigilly.dev/<projectId>`. */
   dsn: string;
   /** Release identifier (e.g. a version or git SHA). */
   release?: string;
