@@ -1,0 +1,27 @@
+{
+  "name": "exceptions-js",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vigilly exceptions clients for JavaScript/TypeScript — branded, Sentry-compatible wrappers.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vigilly/exceptions-js.git"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/browser",
+    "packages/node"
+  ],
+  "scripts": {
+    "build": "tsc -b packages/core packages/browser packages/node",
+    "clean": "tsc -b --clean packages/core packages/browser packages/node",
+    "typecheck": "tsc -b packages/core packages/browser packages/node",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}
