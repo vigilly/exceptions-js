@@ -1,0 +1,22 @@
+{
+  "name": "@vigilly/node",
+  "version": "0.1.0",
+  "description": "Vigilly exceptions client for Node.js — a branded, Sentry-compatible wrapper around @sentry/node.",
+  "license": "MIT",
+  "keywords": ["vigilly", "errors", "exceptions", "monitoring", "sentry", "node"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vigilly/exceptions-js.git",
+    "directory": "packages/node"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "src", "!**/*.test.*"],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@sentry/node": "^10.0.0",
+    "@vigilly/core": "^0.1.0"
+  }
+}

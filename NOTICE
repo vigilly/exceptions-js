@@ -1,0 +1,24 @@
+Vigilly exceptions clients for JavaScript/TypeScript
+Copyright (c) 2026 vigilly
+
+This product is licensed under the MIT License (see LICENSE).
+
+------------------------------------------------------------------------
+Third-party attribution
+------------------------------------------------------------------------
+
+The @vigilly/browser and @vigilly/node packages are thin wrappers around, and
+depend on, the Sentry JavaScript SDKs:
+
+  - @sentry/browser
+  - @sentry/node
+
+  Copyright (c) Sentry (https://sentry.io) and its contributors.
+  Licensed under the MIT License.
+  https://github.com/getsentry/sentry-javascript
+
+Vigilly wraps these MIT-licensed SDKs: it re-exports a branded API, presets the
+transport to Vigilly's ingest endpoint, and hides upstream features Vigilly does
+not yet support. Vigilly is not affiliated with or endorsed by Sentry. "Sentry"
+is a trademark of Functional Software, Inc.; it is used here only to identify
+the upstream software being wrapped.
