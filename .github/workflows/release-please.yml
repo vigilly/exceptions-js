@@ -33,24 +33,24 @@ jobs:
 
       # ── Publish only when a release was just created ──────────────────────
       - uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
       - uses: actions/setup-node@v4
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         with:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
       - name: Ensure npm supports trusted publishing
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
       - run: npm ci
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
       - run: npm run build
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       # Publish in dependency order; each guarded by that package's release flag.
       - run: npm publish --workspace @vigilly/core --provenance --access public
-        if: ${{ steps.release.outputs['packages/core--release_created'] }}
+        if: ${{ steps.release.outputs['packages/core--release_created'] == 'true' }}
       - run: npm publish --workspace @vigilly/browser --provenance --access public
-        if: ${{ steps.release.outputs['packages/browser--release_created'] }}
+        if: ${{ steps.release.outputs['packages/browser--release_created'] == 'true' }}
       - run: npm publish --workspace @vigilly/node --provenance --access public
-        if: ${{ steps.release.outputs['packages/node--release_created'] }}
+        if: ${{ steps.release.outputs['packages/node--release_created'] == 'true' }}
