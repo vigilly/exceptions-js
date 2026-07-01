@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "separate-pull-requests": false,
+  "packages": {
+    "packages/core": {},
+    "packages/browser": {},
+    "packages/node": {}
+  },
+  "plugins": [
+    "node-workspace",
+    {
+      "type": "linked-versions",
+      "groupName": "vigilly",
+      "components": ["@vigilly/core", "@vigilly/browser", "@vigilly/node"]
+    }
+  ]
+}
