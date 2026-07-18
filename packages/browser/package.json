@@ -1,9 +1,16 @@
 {
   "name": "@vigilly/browser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vigilly exceptions client for browsers — a branded, Sentry-compatible wrapper around @sentry/browser.",
   "license": "MIT",
-  "keywords": ["vigilly", "errors", "exceptions", "monitoring", "sentry", "browser"],
+  "keywords": [
+    "vigilly",
+    "errors",
+    "exceptions",
+    "monitoring",
+    "sentry",
+    "browser"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/vigilly/exceptions-js.git",
@@ -11,7 +18,11 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "src", "!**/*.test.*"],
+  "files": [
+    "dist",
+    "src",
+    "!**/*.test.*"
+  ],
   "scripts": {
     "build": "tsc -b"
   },
@@ -26,6 +37,6 @@
     "@opentelemetry/sdk-trace-web": "^2.9.0",
     "@opentelemetry/semantic-conventions": "^1.43.0",
     "@sentry/browser": "^10.0.0",
-    "@vigilly/core": "^0.1.0"
+    "@vigilly/core": "^0.2.0"
   }
 }

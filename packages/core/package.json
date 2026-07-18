@@ -1,6 +1,6 @@
 {
   "name": "@vigilly/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared internals for the Vigilly exceptions clients: DSN parsing and Sentry option mapping.",
   "license": "MIT",
   "repository": {
@@ -10,7 +10,11 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "src", "!**/*.test.*"],
+  "files": [
+    "dist",
+    "src",
+    "!**/*.test.*"
+  ],
   "scripts": {
     "build": "tsc -b"
   }

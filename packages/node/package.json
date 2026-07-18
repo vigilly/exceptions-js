@@ -1,9 +1,21 @@
 {
   "name": "@vigilly/node",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vigilly observability client for Node.js — exceptions (Sentry-compatible) plus OpenTelemetry traces, metrics and logs in one call.",
   "license": "MIT",
-  "keywords": ["vigilly", "errors", "exceptions", "monitoring", "observability", "opentelemetry", "otlp", "tracing", "metrics", "sentry", "node"],
+  "keywords": [
+    "vigilly",
+    "errors",
+    "exceptions",
+    "monitoring",
+    "observability",
+    "opentelemetry",
+    "otlp",
+    "tracing",
+    "metrics",
+    "sentry",
+    "node"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/vigilly/exceptions-js.git",
@@ -11,7 +23,11 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "src", "!**/*.test.*"],
+  "files": [
+    "dist",
+    "src",
+    "!**/*.test.*"
+  ],
   "scripts": {
     "build": "tsc -b"
   },
@@ -27,6 +43,6 @@
     "@opentelemetry/sdk-trace-node": "^1.30.1",
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "@sentry/node": "^10.0.0",
-    "@vigilly/core": "^0.1.0"
+    "@vigilly/core": "^0.2.0"
   }
 }
