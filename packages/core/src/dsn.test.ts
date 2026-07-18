@@ -24,6 +24,19 @@ describe("parseVigillyDsn", () => {
     expect(c.projectId).toBe("42");
   });
 
+  it("parses the canonical /api/observe/<slug> path (real Vigilly DSN shape)", () => {
+    const c = parseVigillyDsn(
+      "https://b6dd25a9689f8652a1963c4a38867141@vigilly.dev/api/observe/kavaro-uyz21",
+    );
+    expect(c).toEqual({
+      publicKey: "b6dd25a9689f8652a1963c4a38867141",
+      protocol: "https",
+      host: "vigilly.dev",
+      projectId: "kavaro-uyz21",
+    });
+    expect(envelopeTunnelUrl(c)).toBe("https://vigilly.dev/api/observe/kavaro-uyz21/envelope/");
+  });
+
   it("rejects DSNs without a project id path segment", () => {
     expect(() => parseVigillyDsn("https://abc123@vigilly.dev")).toThrow(InvalidVigillyDsnError);
   });

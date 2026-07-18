@@ -1,19 +1,21 @@
 /**
  * Vigilly DSN parsing.
  *
- * A Vigilly DSN is a standard Sentry-shaped DSN:
+ * A Vigilly DSN is a Sentry-shaped DSN whose path is the Observe ingest path:
  *
- *     https://<publicKey>@<host>/<projectId>
+ *     https://<publicKey>@<host>/api/observe/<projectId>
  *
- * e.g. `https://<publicKey>@vigilly.dev/<projectId>`. The host is the Vigilly
- * Observe ingest host (`vigilly.dev` in prod, `staging.vigilly.dev` /
+ * e.g. `https://<publicKey>@vigilly.dev/api/observe/<projectId>`. The host is the
+ * Vigilly Observe ingest host (`vigilly.dev` in prod, `staging.vigilly.dev` /
  * `local.vigilly.dev` for other envs) and is used AS-IS. The public key
- * identifies the service to Vigilly ingest; the projectId is the DSN path
- * segment (present for Sentry-DSN-format compatibility, not used for auth).
+ * identifies the service to Vigilly ingest; the projectId is the LAST path
+ * segment.
  *
  * Vigilly's ingest route is `<host>/api/observe/<projectId>/envelope/`, which is
  * NOT the path a stock Sentry DSN derives (`<host>/api/<projectId>/envelope/`).
  * The wrapper bridges that gap with the SDK's `tunnel` option — see `options.ts`.
+ * The projectId is taken as the last path segment, so a bare `<host>/<projectId>`
+ * DSN is accepted too (the ingest path is reconstructed either way).
  */
 
 export interface VigillyDsnComponents {
@@ -76,7 +78,7 @@ export function parseVigillyDsn(dsn: string): VigillyDsnComponents {
   if (!projectId) {
     throw new InvalidVigillyDsnError(
       dsn,
-      "missing project id (expected https://<publicKey>@<host>/<projectId>)",
+      "missing project id (expected https://<publicKey>@<host>/api/observe/<projectId>)",
     );
   }
 
