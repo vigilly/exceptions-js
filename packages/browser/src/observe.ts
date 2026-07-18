@@ -66,11 +66,15 @@ export function initObserve(options: BrowserObserveOptions): void {
   const dsn = parseVigillyDsn(options.dsn);
 
   if (options.exceptions !== false) {
+    const extra = options.exceptionOptions ?? {};
     initExceptions({
-      ...(options.exceptionOptions ?? {}),
+      ...extra,
       dsn: options.dsn,
       environment: options.environment,
       release: options.release,
+      // `service.name` matches the OTLP resource attribute, so browser exceptions
+      // route to the SAME Vigilly component as this service's browser traces.
+      initialScope: extra.initialScope ?? { tags: { "service.name": options.service } },
     });
   }
 

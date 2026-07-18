@@ -177,7 +177,10 @@ export function initObserve(options: ObserveOptions): Observe {
         environment,
         release,
         serverName: service,
-        initialScope: extra.initialScope ?? { tags: { host: os.hostname(), service } },
+        // `service.name` matches the OTLP resource attribute, so exceptions route to
+        // the SAME Vigilly component as this service's traces/metrics/logs; keep the
+        // real machine hostname as a `host` tag.
+        initialScope: extra.initialScope ?? { tags: { host: os.hostname(), "service.name": service } },
         beforeSend: (event, hint) => {
           if (options.captureAbortErrors !== true && isRequestAbortError(hint?.originalException)) {
             return null;
