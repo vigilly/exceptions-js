@@ -1,43 +1,40 @@
 /**
- * `@vigilly/node` — the Vigilly exceptions client for Node.js.
+ * `@vigilly/node` — the Vigilly observability client for Node.js.
  *
- * A thin, branded wrapper around the MIT-licensed `@sentry/node` SDK. It presets
- * the transport to Vigilly's ingest (via the SDK's `tunnel` option, pointing at
- * `https://<host>/api/observe/<projectId>/envelope/`) and exposes only the
- * exception-reporting surface Vigilly supports today.
+ * Two entry points:
  *
- *     import { Vigilly } from "@vigilly/node";
- *     Vigilly.init({ dsn: "https://<publicKey>@vigilly.dev/<projectId>" });
- *     Vigilly.captureException(new Error("boom"));
+ *   - Exceptions only (a thin `@sentry/node` wrapper):
+ *
+ *         import { Vigilly } from "@vigilly/node";
+ *         Vigilly.init({ dsn: "https://<publicKey>@vigilly.dev/api/observe/<projectId>" });
+ *         Vigilly.captureException(new Error("boom"));
+ *
+ *   - Full observability — exceptions + OTLP traces/metrics/logs in one call:
+ *
+ *         import { initObserve, observeRequestMiddleware } from "@vigilly/node";
+ *         initObserve({ dsn, service: "my-app", environment, release });
+ *         server.use(observeRequestMiddleware()); // request spans + http.server.* metrics
  */
-import * as Sentry from "@sentry/node";
-import { resolveVigillyOptions, type VigillyOptions } from "@vigilly/core";
+import {
+  init,
+  captureException,
+  captureMessage,
+  addBreadcrumb,
+  setContext,
+  setTag,
+  setTags,
+  setExtra,
+  setExtras,
+  setUser,
+  withScope,
+  getCurrentScope,
+  flush,
+  close,
+} from "./exceptions";
+import { initObserve, getTracer, getMeter, getLogger, shutdownObserve } from "./observe";
 
-/**
- * Initialise the Vigilly Node client. Wraps `Sentry.init`, routing all envelopes
- * to `https://<host>/api/observe/<projectId>/envelope/`.
- */
-export function init(options: VigillyOptions): ReturnType<typeof Sentry.init> {
-  return Sentry.init(resolveVigillyOptions(options) as Sentry.NodeOptions);
-}
-
-// Re-exported, supported capture & context API (1:1 with the Sentry SDK).
-export const captureException = Sentry.captureException;
-export const captureMessage = Sentry.captureMessage;
-export const addBreadcrumb = Sentry.addBreadcrumb;
-export const setContext = Sentry.setContext;
-export const setTag = Sentry.setTag;
-export const setTags = Sentry.setTags;
-export const setExtra = Sentry.setExtra;
-export const setExtras = Sentry.setExtras;
-export const setUser = Sentry.setUser;
-export const withScope = Sentry.withScope;
-export const getCurrentScope = Sentry.getCurrentScope;
-export const flush = Sentry.flush;
-export const close = Sentry.close;
-
-/** Convenience namespace mirroring the named exports. */
-export const Vigilly = {
+// ── Exception surface (1:1 with the Sentry SDK) ─────────────────────────────
+export {
   init,
   captureException,
   captureMessage,
@@ -54,6 +51,38 @@ export const Vigilly = {
   close,
 };
 
-export default Vigilly;
+// ── Observability surface ───────────────────────────────────────────────────
+export { initObserve, getTracer, getMeter, getLogger, shutdownObserve } from "./observe";
+export type { ObserveOptions, Observe } from "./observe";
+export { observeRequestMiddleware, normalizeRoute } from "./middleware";
+export type { RequestMiddleware, RequestMiddlewareOptions } from "./middleware";
+export { isRequestAbortError } from "./abortErrors";
 
 export type { VigillyOptions, VigillyBreadcrumb } from "@vigilly/core";
+
+/** Convenience namespace mirroring the named exports. */
+export const Vigilly = {
+  // exceptions
+  init,
+  captureException,
+  captureMessage,
+  addBreadcrumb,
+  setContext,
+  setTag,
+  setTags,
+  setExtra,
+  setExtras,
+  setUser,
+  withScope,
+  getCurrentScope,
+  flush,
+  close,
+  // observability
+  initObserve,
+  getTracer,
+  getMeter,
+  getLogger,
+  shutdownObserve,
+};
+
+export default Vigilly;
